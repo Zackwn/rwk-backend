@@ -1,9 +1,10 @@
 import { Server as SocketServer } from 'socket.io'
 
 declare global {
-  declare namespace Express {
+  namespace Express {
     export interface Request {
-      socketIo: SocketServer
+      socketIo: SocketServer,
+      socketId: string
     }
   }
 }

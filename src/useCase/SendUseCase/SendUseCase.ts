@@ -35,7 +35,6 @@ export class SendUseCase {
           }
         })
       }, 10000 * 2)
-      console.log('came here. should return data')
       return { room, statusData: data }
     } else {
       throw new Error('client not connected')

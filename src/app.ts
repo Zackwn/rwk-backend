@@ -1,8 +1,8 @@
-import cors from 'cors';
-import express from 'express';
-import * as http from 'http';
-import { Server } from 'socket.io';
-import { routes } from './routes';
+import cors from 'cors'
+import express from 'express'
+import * as http from 'http'
+import { Server } from 'socket.io'
+import { routes } from './routes'
 
 const PORT = Number(process.env.PORT) || 3333
 // const dev = process.env.NODE_ENV !== 'production'
@@ -32,8 +32,6 @@ const connected: { [key: string]: true } = {}
 io.on('connection', socket => {
   console.log(`${socket.id} connected!`)
   connected[socket.id] = true
-
-  console.log({ connected })
 
   socket.on('disconnect', () => {
     console.log(`${socket.id} disconnect!`)
