@@ -18,11 +18,18 @@ routes.post('/api/send', withSocketID, async (req, res) => {
     webhookUrl
   } = req.body
 
+  const accessToken = req.headers['access_token']
+
+  if (!accessToken) {
+    return res.status(400).send()
+  }
+
   const data = {
     socketID: req.socketId,
     limit,
     subreddit,
-    webhookUrl
+    webhookUrl,
+    accessToken: String(accessToken)
   }
 
   return res.json(await sendUseCase.handle(data, req.socketIo))

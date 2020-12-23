@@ -3,9 +3,7 @@ import express from 'express'
 import * as http from 'http'
 import { Server } from 'socket.io'
 import { routes } from './routes'
-
-const PORT = Number(process.env.PORT) || 3333
-// const dev = process.env.NODE_ENV !== 'production'
+import { __PORT__, __PROD__ } from './constants'
 
 const app = express()
 const server = http.createServer(app)
@@ -40,6 +38,6 @@ io.on('connection', socket => {
   })
 })
 
-server.listen(PORT, () => {
-  console.log(`> Ready on http://localhost:${PORT}`)
+server.listen(__PORT__, () => {
+  console.log(`> Ready on http://localhost:${__PORT__}\n> PROD: ${__PROD__}`)
 })

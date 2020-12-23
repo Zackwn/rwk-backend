@@ -4,7 +4,8 @@ export type RedditPost = {
 
 export interface getRedditPostsParams {
   subreddit: string,
-  limit: number
+  limit: number,
+  accessToken: string
 }
 
 export interface IRedditPosts {

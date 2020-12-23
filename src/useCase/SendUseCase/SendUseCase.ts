@@ -12,7 +12,7 @@ export class SendUseCase {
     this.SendDiscord = sendDiscord
   }
 
-  async handle({ limit, socketID, subreddit, webhookUrl }: SendUseCaseDTO, socketIo: SocketServer) {
+  async handle({ limit, socketID, subreddit, webhookUrl, accessToken }: SendUseCaseDTO, socketIo: SocketServer) {
     console.log({ limit, subreddit, webhookUrl, socketID })
 
     const room = `status_room:${socketID}`
@@ -20,21 +20,30 @@ export class SendUseCase {
     let client = socketIo.sockets.sockets.get(socketID)
     if (client) {
       console.log('there is a client!')
-      let data = (await this.RedditPosts.getBySubreddit({ subreddit, limit })).map(e => ({ url: e, status: 'PENDING' }))
+
+      let data = (await this.RedditPosts.getBySubreddit({ subreddit, limit, accessToken }))
+        .map(e => ({ url: e, status: 'PENDING' }))
+
       let index = 0
+
       let intervalID = setInterval(() => {
         this.SendDiscord.send(webhookUrl, data[index].url).then(status => {
           console.log({ index })
+
           data[index].status = status
+
           console.log(data[index])
+
           socketIo.emit(room, { status: data[index].status, index: index })
           index++
+
           if (index === data.length) {
             socketIo.emit(room, { end: true })
             clearInterval(intervalID)
           }
         })
       }, 10000 * 2)
+
       return { room, statusData: data }
     } else {
       throw new Error('client not connected')
