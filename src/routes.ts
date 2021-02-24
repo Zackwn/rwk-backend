@@ -3,6 +3,7 @@ import { Router } from 'express'
 // useCases
 import { generateSendUseCase } from './factories/SendUseCase'
 import withSocketID from './middlewares/withSocketID'
+import { SendUseCaseDTO } from './useCase/SendUseCase/SendDTO'
 const sendUseCase = generateSendUseCase()
 
 const routes = Router()
@@ -21,10 +22,10 @@ routes.post('/api/send', withSocketID, async (req, res) => {
   const accessToken = req.headers['access_token']
 
   if (!accessToken) {
-    return res.status(400).send()
+    return res.status(401).send()
   }
 
-  const data = {
+  const data: SendUseCaseDTO = {
     socketID: req.socketId,
     limit,
     subreddit,

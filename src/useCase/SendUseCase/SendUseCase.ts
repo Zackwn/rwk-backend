@@ -1,14 +1,14 @@
-import { IRedditPosts } from '../../services/RedditPosts'
+import { IRedditAPI } from '../../services/RedditPosts'
 import { ISendDiscord } from '../../services/SendDiscord'
 import { SendUseCaseDTO } from './SendDTO'
 import { Server as SocketServer } from 'socket.io'
 
 export class SendUseCase {
-  RedditPosts: IRedditPosts
+  RedditAPI: IRedditAPI
   SendDiscord: ISendDiscord
 
-  constructor(redditPosts: IRedditPosts, sendDiscord: ISendDiscord) {
-    this.RedditPosts = redditPosts
+  constructor(redditAPI: IRedditAPI, sendDiscord: ISendDiscord) {
+    this.RedditAPI = redditAPI
     this.SendDiscord = sendDiscord
   }
 
@@ -21,30 +21,38 @@ export class SendUseCase {
     if (client) {
       console.log('there is a client!')
 
-      let data = (await this.RedditPosts.getBySubreddit({ subreddit, limit, accessToken }))
-        .map(e => ({ url: e, status: 'PENDING' }))
+      const redditUser = await this.RedditAPI.getMe({ accessToken })
+
+      console.log({ redditUser })
+
+      const posts = (await this.RedditAPI.getByPostsSubreddit({ subreddit, limit, accessToken }))
+        .map(e => ({ url: e.url, status: 'PENDING' }))
+
+      console.log({ posts })
 
       let index = 0
 
       let intervalID = setInterval(() => {
-        this.SendDiscord.send(webhookUrl, data[index].url).then(status => {
-          console.log({ index })
+        this.SendDiscord.exec({
+          webhookURL: webhookUrl,
+          postURL: posts[index].url,
+          user: redditUser
+        }).then(status => {
+          posts[index].status = status
 
-          data[index].status = status
+          console.log(posts[index])
 
-          console.log(data[index])
-
-          socketIo.emit(room, { status: data[index].status, index: index })
+          socketIo.emit(room, { status: posts[index].status, index: index })
           index++
 
-          if (index === data.length) {
+          if (index === posts.length) {
             socketIo.emit(room, { end: true })
             clearInterval(intervalID)
           }
         })
       }, 10000 * 2)
 
-      return { room, statusData: data }
+      return { room, statusData: posts }
     } else {
       throw new Error('client not connected')
     }

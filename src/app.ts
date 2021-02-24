@@ -28,11 +28,11 @@ app.use(routes)
 
 const connected: { [key: string]: true } = {}
 io.on('connection', socket => {
-  console.log(`${socket.id} connected!`)
+  console.log(`${socket.id} connected`)
   connected[socket.id] = true
 
   socket.on('disconnect', () => {
-    console.log(`${socket.id} disconnect!`)
+    console.log(`${socket.id} disconnect`)
 
     delete connected[socket.id]
   })

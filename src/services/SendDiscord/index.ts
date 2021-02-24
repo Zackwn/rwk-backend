@@ -1,5 +1,13 @@
+import { RedditUser } from "../RedditPosts";
+
 export type DiscordSendStatus = "SUCCESS" | "FAILED"
 
+export interface SendDiscordOptions {
+  webhookURL: string,
+  postURL: string,
+  user: RedditUser
+}
+
 export interface ISendDiscord {
-  send(webhookURL: string, content: any): Promise<DiscordSendStatus>
+  exec(options: SendDiscordOptions): Promise<DiscordSendStatus>
 }
