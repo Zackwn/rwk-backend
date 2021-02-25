@@ -1,5 +1,6 @@
 export type RedditPost = {
-  url: string
+  url: string,
+  isMedia: boolean
 }
 
 export interface RedditUser {

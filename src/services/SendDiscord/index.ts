@@ -1,11 +1,11 @@
-import { RedditUser } from "../RedditPosts";
+import { RedditPost, RedditUser } from "../RedditPosts";
 
 export type DiscordSendStatus = "SUCCESS" | "FAILED"
 
 export interface SendDiscordOptions {
-  webhookURL: string,
-  postURL: string,
-  user: RedditUser
+  post: RedditPost
+  user: RedditUser,
+  webhookURL: string
 }
 
 export interface ISendDiscord {

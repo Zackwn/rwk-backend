@@ -1,4 +1,4 @@
-import { IRedditAPI } from '../../services/RedditPosts'
+import { IRedditAPI, RedditPost } from '../../services/RedditPosts'
 import { ISendDiscord } from '../../services/SendDiscord'
 import { SendUseCaseDTO } from './SendDTO'
 import { Server as SocketServer } from 'socket.io'
@@ -26,7 +26,7 @@ export class SendUseCase {
       console.log({ redditUser })
 
       const posts = (await this.RedditAPI.getByPostsSubreddit({ subreddit, limit, accessToken }))
-        .map(e => ({ url: e.url, status: 'PENDING' }))
+        .map(e => ({ ...e, status: 'PENDING' }))
 
       console.log({ posts })
 
@@ -35,7 +35,7 @@ export class SendUseCase {
       let intervalID = setInterval(() => {
         this.SendDiscord.exec({
           webhookURL: webhookUrl,
-          postURL: posts[index].url,
+          post: posts[index],
           user: redditUser
         }).then(status => {
           posts[index].status = status

@@ -9,6 +9,10 @@ interface _RequestOptions {
 }
 
 export class RedditPosts implements IRedditAPI {
+  private readonly mediaCheckWords: string[] = [
+    ".jpg", ".png", ".gif", ".webm", "imgur.com", "gfycat.com"
+  ]
+
   private async request(options: _RequestOptions) {
     const response = await fetch(options.url, {
       method: options.method,
@@ -62,8 +66,20 @@ export class RedditPosts implements IRedditAPI {
     })
 
     console.log({ redditResLength: response.data.dist })
-    return response.data.children.map((posts: any) => {
-      return { url: posts.data.url || posts.data.url_overridden_by_dest }
-    }) as RedditPost[]
+
+    const redditPosts: RedditPost[] = []
+
+    response.data.children.forEach((posts: any) => {
+      const postURL = String(posts.data.url || posts.data.url_overridden_by_dest)
+      const isMedia = !!this.mediaCheckWords.find((word) => {
+        return postURL.includes(word)
+      })
+      redditPosts.push({
+        url: postURL,
+        isMedia: isMedia
+      })
+    })
+
+    return redditPosts
   }
 }

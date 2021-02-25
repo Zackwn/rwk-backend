@@ -1,18 +1,20 @@
 import { ISendDiscord, DiscordSendStatus, SendDiscordOptions } from '../index'
 import fetch from 'isomorphic-unfetch'
+import { IPostToEmbedMessage } from '../../../adapters/PostToEmbedMessage'
 
 export class SendDiscord implements ISendDiscord {
+  private readonly postToEmbedMessage: IPostToEmbedMessage
+
+  public constructor(postToEmbedMessage: IPostToEmbedMessage) {
+    this.postToEmbedMessage = postToEmbedMessage
+  }
+
   async exec(options: SendDiscordOptions): Promise<DiscordSendStatus> {
     try {
-      const embed = {
-        image: {
-          url: options.postURL
-        },
-        author: {
-          name: options.user.name,
-          icon_url: options.user.profilePictureURL
-        }
-      }
+      const embed = this.postToEmbedMessage.exec({
+        redditPost: options.post,
+        redditUser: options.user
+      })
 
       console.log({ embed })
 
